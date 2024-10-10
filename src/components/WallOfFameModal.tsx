@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 
-const WallOfLoveModal = ({ isOpen, onClose }) => {
-  const [showMoreCustomization, setShowMoreCustomization] = useState(false);
-  const [maxTestimonials, setMaxTestimonials] = useState(20);
+interface WallOfLoveModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const WallOfLoveModal: React.FC<WallOfLoveModalProps> = ({ isOpen, onClose }) => {
+  const [showMoreCustomization, setShowMoreCustomization] = useState<boolean>(false);
+  const [maxTestimonials, setMaxTestimonials] = useState<number>(20);
 
   if (!isOpen) return null;
 
@@ -59,7 +64,6 @@ const WallOfLoveModal = ({ isOpen, onClose }) => {
               <input type="checkbox" className="mr-2" /> Remove Testimonial branding 🔒
             </label>
 
-
             <label className="flex items-center">
               <input type="checkbox" className="mr-2" /> Hide the date
             </label>
@@ -74,7 +78,7 @@ const WallOfLoveModal = ({ isOpen, onClose }) => {
             <input 
               type="number" 
               value={maxTestimonials} 
-              onChange={(e) => setMaxTestimonials(e.target.value)} 
+              onChange={(e) => setMaxTestimonials(Number(e.target.value))} 
               className="w-16 p-1 border rounded"
               min="1"
               max="100"
@@ -82,7 +86,6 @@ const WallOfLoveModal = ({ isOpen, onClose }) => {
           </div>
 
         </div>
-
 
         <div className="flex justify-between">
           <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded">Close</button>

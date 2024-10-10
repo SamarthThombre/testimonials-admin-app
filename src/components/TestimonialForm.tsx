@@ -1,10 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import TestimonialPreview from "./TestimonialPreview";
 
-export default function TestimonialForm({ onSubmit }) {
+interface FormData {
+  spaceName: string;
+  headerTitle: string;
+  customMessage: string;
+  questions: string[];
+  createdAt: string;
+  testimonialCount: number;
+  link: string;
+}
+
+interface TestimonialFormProps {
+  onSubmit: (formData: FormData) => void;
+}
+
+export default function TestimonialForm({ onSubmit }: TestimonialFormProps) {
   const [formData, setFormData] = useState({
     spaceName: "",
     headerTitle: "",
@@ -14,50 +28,50 @@ export default function TestimonialForm({ onSubmit }) {
       "How has (our product / service) helped you?",
       "What is the best thing about (our product / service)?",
     ],
-    // collectionType: 'Text and video',
-    // collectStarRatings: true
+    createdAt: new Date().toISOString().split("T")[0],
+    testimonialCount: 0,
+    link: ""
   });
   const router = useRouter();
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
-  const handleQuestionChange = (index, value) => {
+  const handleQuestionChange = (index: number, value: string) => {
     const newQuestions = [...formData.questions];
     newQuestions[index] = value;
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      questions: newQuestions
+      questions: newQuestions,
     }));
   };
 
   const addQuestion = () => {
     if (formData.questions.length < 5) {
-        setFormData(prevData => ({
-            ...prevData,
-            questions: [...prevData.questions, '']
-          }));
-        }
-      };
-    
-      const removeQuestion = (index) => {
-        setFormData(prevData => ({
-          ...prevData,
-          questions: prevData.questions.filter((_, i) => i !== index)
-        }));
-      };
+      setFormData((prevData) => ({
+        ...prevData,
+        questions: [...prevData.questions, ""],
+      }));
+    }
+  };
 
+  const removeQuestion = (index: number) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      questions: prevData.questions.filter((_, i) => i !== index),
+    }));
+  };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(formData);
     onSubmit(formData);
-    router.push('/dashboard');
+    router.push("/dashboard");
   };
 
   return (

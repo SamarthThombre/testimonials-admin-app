@@ -2,17 +2,32 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Navbar from '../../components/Navbar';
-import WallOfLoveModal from '../../components/WallOfFameModal';
+import Navbar from '../../../components/Navbar';
+import WallOfLoveModal from '../../../components/WallOfFameModal';
 
-export default function ProductPage({ params }) {
-  const productTitle = decodeURIComponent(params.product_title);
+interface Testimonial {
+  id: string;
+  type: string;
+  rating: number;
+  textContent: string;
+  userName: string;
+  email: string;
+  createdAt: string;
+}
+
+export default function ProductPage({ params }: { params: { spaceName: string } }) {
+  const spaceName = decodeURIComponent(params.spaceName);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotification, setShowNotification] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   useEffect(() => {
-    let timer;
+    fetchTestimonials();
+  }, []);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
     if (showNotification) {
       timer = setTimeout(() => {
         setShowNotification(false);
@@ -21,7 +36,28 @@ export default function ProductPage({ params }) {
     return () => clearTimeout(timer);
   }, [showNotification]);
 
-  const handleHeartClick = () => {
+
+  const fetchTestimonials = async () => {
+    try {
+      const response = await fetch(`/api/testimonials/${encodeURIComponent(spaceName)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(response);
+      if (response.ok) {
+        const data = await response.json();
+        setTestimonials(data);
+      } else {
+        console.error('Failed to fetch testimonials');
+      }
+    } catch (error) {
+      console.error('Error fetching testimonials:', error);
+    }
+  };
+
+  const handleHeartClick = (testimonialId: string) => {
     setShowNotification(true);
   };
 
@@ -42,11 +78,11 @@ export default function ProductPage({ params }) {
 
       {/* Main content */}
       <div className="container mx-auto p-4">
-        {/* Product title and info */}
+        {/* space title and info */}
         <div className="mb-6 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">{productTitle}</h1>
-            <p className="text-gray-400">Space public URL: https://testimonial.to/{productTitle.toLowerCase().replace(/\s+/g, '-')}</p>
+            <h1 className="text-3xl font-bold">{spaceName}</h1>
+            <p className="text-gray-400">Space public URL: localhost:3001/{spaceName.toLowerCase().replace(/\s+/g, '-')}</p>
           </div>
            <div className="flex space-x-4">
             <button className="bg-gray-700 px-4 py-2 rounded">Edit Space</button>
@@ -104,28 +140,37 @@ export default function ProductPage({ params }) {
               <button className="bg-gray-700 px-4 py-2 rounded">Options ▼</button>
             </div>
             {/* Testimonial card */}
-            <div className="bg-gray-800 p-4 rounded">
+             {/* Testimonial cards */}
+          {testimonials.filter(t => 
+            t.textContent.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            t.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            t.email.toLowerCase().includes(searchQuery.toLowerCase())
+          ).map((testimonial) => (
+            <div key={testimonial.id} className="bg-gray-800 p-4 rounded mb-4">
               <div className="flex justify-between items-start mb-2">
-                <span className="bg-blue-500 text-white px-2 py-1 rounded text-sm">Text</span>
-                  <button className="text-red-500" onClick={handleHeartClick}>♥</button>
+                <span className="bg-blue-500 text-white px-2 py-1 rounded text-sm">
+                  {testimonial.type}
+                </span>
+                <button className="text-red-500" onClick={() => handleHeartClick(testimonial.id)}>♥</button>
               </div>
-              <div className="text-yellow-500 mb-2">★★★★★</div>
-              <p className="mb-4">Amazing website. Loved the UX, very smooth learning. 10/10 from my side. Buy cohort 3.0</p>
+              <div className="text-yellow-500 mb-2">{'★'.repeat(testimonial.rating)}</div>
+              <p className="mb-4">{testimonial.textContent}</p>
               <div className="grid grid-cols-2 gap-4 text-sm text-gray-400">
                 <div>
                   <p>Name</p>
-                  <p>harkirat</p>
+                  <p>{testimonial.userName}</p>
                 </div>
                 <div>
                   <p>Email</p>
-                  <p>harkirat.litr@gmail.com</p>
+                  <p>{testimonial.email}</p>
                 </div>
                 <div>
                   <p>Submitted At</p>
-                  <p>Jul 4, 2024, 10:14:28 AM</p>
+                  <p>{new Date(testimonial.createdAt).toLocaleString().split(',')[0]}</p>
                 </div>
               </div>
             </div>
+          ))}
           </div>
         </div>
       </div>
