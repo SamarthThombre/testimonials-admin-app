@@ -6,10 +6,11 @@ import TestimonialForm from '../../components/TestimonialForm';
 import SpaceCard from '../../components/SpaceCard';
 import Navbar from '../../components/Navbar';
 import { addSpace, getSpaces } from '../../config/firebaseConfig';
+import { DocumentData } from 'firebase/firestore';
 
 export default function Dashboard() {
   const [showForm, setShowForm] = useState(false);
-  const [spaces, setSpaces] = useState([{id: '', spaceTitle: ''}]);
+  const [spaces, setSpaces] = useState([{id: '', spaceName: ''}]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleFormSubmit = async(formData:any) => {
+  const handleFormSubmit = async(formData: DocumentData) => {
     try {
       await addSpace(formData);
       await fetchSpaces(); // Refresh the spaces list
@@ -59,7 +60,7 @@ export default function Dashboard() {
               <div className="w-full max-w-2xl">
                 <h2 className="text-2xl font-bold mb-4">Spaces</h2>
                 {spaces.map((space) => (
-                  <Link key={space.id} href={`/products/${encodeURIComponent(space.spaceTitle)}`}>
+                  <Link key={space.id} href={`/products/${encodeURIComponent(space.spaceName)}`}>
                     <SpaceCard spaceData={space} />
                   </Link>
                 ))}

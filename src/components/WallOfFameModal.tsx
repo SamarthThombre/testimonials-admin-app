@@ -1,15 +1,31 @@
-import React, { useState } from 'react';
+/* eslint-disable */
+import React, { useRef, useState } from 'react';
 
 interface WallOfLoveModalProps {
   isOpen: boolean;
   onClose: () => void;
+  spaceName: string;
 }
 
-const WallOfLoveModal: React.FC<WallOfLoveModalProps> = ({ isOpen, onClose }) => {
+const WallOfLoveModal: React.FC<WallOfLoveModalProps> = ({ isOpen, onClose, spaceName }) => {
   const [showMoreCustomization, setShowMoreCustomization] = useState<boolean>(false);
   const [maxTestimonials, setMaxTestimonials] = useState<number>(20);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
+  const codeRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen) return null;
+
+  const handleCopy = () => {
+    if (codeRef.current) {
+      const codeText = codeRef.current.innerText;
+      navigator.clipboard.writeText(codeText).then(() => {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 overflow-y-auto">
@@ -31,13 +47,13 @@ const WallOfLoveModal: React.FC<WallOfLoveModalProps> = ({ isOpen, onClose }) =>
               </svg>
               Masonry - fixed
             </p>
-            <div className="bg-gray-800 text-gray-300 p-2 rounded mt-2 text-sm overflow-x-auto">
+            <div ref={codeRef} className="bg-gray-800 text-gray-300 p-2 rounded mt-2 text-sm overflow-x-auto">
               <code>
-                &lt;script type="text/javascript" src="https://testimonial.to/js/iframeResizer.min.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="localhost:3000/js/iframe-resizer.parent.js"&gt;&lt;/script&gt;
                 <br />
-                &lt;iframe id="testimonialto-100xdevs-landing-page-tag-all-light" src="https://embed.testimonial.to/w/"&gt;&lt;/iframe&gt;
+                &lt;iframe id="unique-id" src="localhost:3000/embed/{encodeURIComponent(spaceName)}/?theme=light&initialCount={maxTestimonials}"&gt;&lt;/iframe&gt;
                 <br />
-                &lt;script type="text/javascript"&gt;iFrameResize(&#123;log: false, checkOrigin: false&#125;, "#testimonialto-100xdevs-landing-page-tag-all-light")&lt;/script&gt;
+                &lt;script type="text/javascript"&gt;iFrameResize(&#123;log: false, checkOrigin: false&#125;, "#unique-id")&lt;/script&gt;
               </code>
             </div>
           </div>
@@ -89,7 +105,12 @@ const WallOfLoveModal: React.FC<WallOfLoveModalProps> = ({ isOpen, onClose }) =>
 
         <div className="flex justify-between">
           <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded">Close</button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded">Copy</button>
+          <button 
+            onClick={handleCopy} 
+            className={`px-4 py-2 ${isCopied ? 'bg-green-600' : 'bg-blue-600'} text-white rounded transition-colors duration-300`}
+          >
+            {isCopied ? 'Copied!' : 'Copy'}
+          </button>        
         </div>
       </div>
     </div>

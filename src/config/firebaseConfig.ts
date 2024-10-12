@@ -38,7 +38,7 @@ export async function getSpaces() {
     const spacesSnapshot = await getDocs(spacesCollection);
     const spacesList = spacesSnapshot.docs.map(doc => ({
       id: doc.id,
-      spaceTitle: doc.data().spaceName,
+      spaceName: doc.data().spaceName,
       ...doc.data()
     }));
     return spacesList;

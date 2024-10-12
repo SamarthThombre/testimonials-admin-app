@@ -1,43 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect, useCallback } from 'react';
 import Navbar from '../../../components/Navbar';
 import WallOfLoveModal from '../../../components/WallOfFameModal';
-
-interface Testimonial {
-  id: string;
-  type: string;
-  rating: number;
-  textContent: string;
-  userName: string;
-  email: string;
-  createdAt: string;
-}
+import { FaHeart, FaRegHeart, FaStar, FaRegStar } from 'react-icons/fa';
+import { Testimonial } from '@/interfaces/Testimonial';
 
 export default function ProductPage({ params }: { params: { spaceName: string } }) {
   const spaceName = decodeURIComponent(params.spaceName);
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
-  useEffect(() => {
-    fetchTestimonials();
-  }, []);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (showNotification) {
-      timer = setTimeout(() => {
-        setShowNotification(false);
-      }, 5000);
-    }
-    return () => clearTimeout(timer);
-  }, [showNotification]);
-
-
-  const fetchTestimonials = async () => {
+  const fetchTestimonials = useCallback(async () => {
     try {
       const response = await fetch(`/api/testimonials/${encodeURIComponent(spaceName)}`, {
         method: 'GET',
@@ -55,14 +32,63 @@ export default function ProductPage({ params }: { params: { spaceName: string } 
     } catch (error) {
       console.error('Error fetching testimonials:', error);
     }
-  };
+  }, [spaceName]);
 
-  const handleHeartClick = (testimonialId: string) => {
-    setShowNotification(true);
-  };
+  useEffect(() => {
+    fetchTestimonials();
+  }, [fetchTestimonials]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (showNotification) {
+      timer = setTimeout(() => {
+        setShowNotification(false);
+      }, 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [showNotification]);
+
+  const handleHeartClick = async (testimonialId: string) => {
+    const testimonial = testimonials.find(t => t.id === testimonialId);
+    if (testimonial) {
+      const newIsLiked = !testimonial.isLiked;
+      try {
+        const response = await fetch(`/api/testimonials/${encodeURIComponent(spaceName)}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ testimonialId, isLiked: newIsLiked }),
+        });
+  
+        if (response.ok) {
+          setTestimonials(prevTestimonials =>
+            prevTestimonials.map(t =>
+              t.id === testimonialId ? { ...t, isLiked: newIsLiked } : t
+            )
+          );
+          const message = newIsLiked
+            ? "Added to Wall of Love successfully"
+            : "Removed from Wall of Love successfully";
+          setNotificationMessage(message);
+          setShowNotification(true);
+        } else {
+          console.error('Failed to update testimonial');
+      }
+    } catch (error) {
+      console.error('Error updating testimonial:', error);
+    }
+  }
+};
 
   const handleWallOfLoveClick = () => {
     setIsModalOpen(true);
+  };
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, index) => (
+      index < rating ? <FaStar key={index} className="text-yellow-500 inline" /> : <FaRegStar key={index} className="text-yellow-500 inline" />
+    ));
   };
 
   return (
@@ -72,7 +98,7 @@ export default function ProductPage({ params }: { params: { spaceName: string } 
     {/* Notification */}
     {showNotification && (
           <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50 transition-opacity duration-500">
-            Added to the Wall of Fame Successfully
+            {notificationMessage}
           </div>
         )}
 
@@ -151,9 +177,14 @@ export default function ProductPage({ params }: { params: { spaceName: string } 
                 <span className="bg-blue-500 text-white px-2 py-1 rounded text-sm">
                   {testimonial.type}
                 </span>
-                <button className="text-red-500" onClick={() => handleHeartClick(testimonial.id)}>♥</button>
+                <button 
+                  className={`text-2xl ${testimonial.isLiked ? 'text-red-500' : 'text-white'}`} 
+                  onClick={() => handleHeartClick(testimonial.id)}
+                >
+                  {testimonial.isLiked ? <FaHeart /> : <FaRegHeart />}
+                </button>              
               </div>
-              <div className="text-yellow-500 mb-2">{'★'.repeat(testimonial.rating)}</div>
+              <div className="mb-2">{renderStars(testimonial.rating)}</div>
               <p className="mb-4">{testimonial.textContent}</p>
               <div className="grid grid-cols-2 gap-4 text-sm text-gray-400">
                 <div>
@@ -175,7 +206,7 @@ export default function ProductPage({ params }: { params: { spaceName: string } 
         </div>
       </div>
     </div>
-    <WallOfLoveModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    <WallOfLoveModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} spaceName={spaceName}/>
     </>
   );
 }
