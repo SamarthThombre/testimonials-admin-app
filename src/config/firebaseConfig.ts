@@ -8,15 +8,14 @@ import { getFirestore, collection, addDoc, getDocs, DocumentData } from 'firebas
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDjgNZCPO_AOPWO76o5sClTATpfNsO3mBw",
-  authDomain: "testimonials-db.firebaseapp.com",
-  projectId: "testimonials-db",
-  storageBucket: "testimonials-db.appspot.com",
-  messagingSenderId: "105283987715",
-  appId: "1:105283987715:web:ed21cafb74fe80ccaaa136",
-  measurementId: "G-S37WNZR1BL"
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID
 };
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
