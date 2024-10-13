@@ -33,7 +33,7 @@ export default async function EmbedPage({ params, searchParams }: {
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{`Wall of Fame - ${spaceName}`}</title>
-        <Script src="localhost:3000/js/iframe-resizer.child.js" strategy="afterInteractive" />
+        <Script src={`${process.env.NEXT_PUBLIC_PRODUCTION_URL}/js/iframe-resizer.child.js`} strategy="afterInteractive" />
       </head>
       <body className={theme === 'light' ? 'light-theme' : 'dark-theme'}>
         {error && <p className="error">Error: {error}</p>}

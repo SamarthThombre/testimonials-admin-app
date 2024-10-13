@@ -49,9 +49,9 @@ const WallOfLoveModal: React.FC<WallOfLoveModalProps> = ({ isOpen, onClose, spac
             </p>
             <div ref={codeRef} className="bg-gray-800 text-gray-300 p-2 rounded mt-2 text-sm overflow-x-auto">
               <code>
-                &lt;script type="text/javascript" src="localhost:3000/js/iframe-resizer.parent.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="{process.env.NEXT_PUBLIC_PRODUCTION_URL}/js/iframe-resizer.parent.js"&gt;&lt;/script&gt;
                 <br />
-                &lt;iframe id="unique-id" src="localhost:3000/embed/{encodeURIComponent(spaceName)}/?theme=light&initialCount={maxTestimonials}"&gt;&lt;/iframe&gt;
+                &lt;iframe id="unique-id" src="{process.env.NEXT_PUBLIC_PRODUCTION_URL}/embed/{encodeURIComponent(spaceName)}/?theme=light&initialCount={maxTestimonials}"&gt;&lt;/iframe&gt;
                 <br />
                 &lt;script type="text/javascript"&gt;iFrameResize(&#123;log: false, checkOrigin: false&#125;, "#unique-id")&lt;/script&gt;
               </code>
