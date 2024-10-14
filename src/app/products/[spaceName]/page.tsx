@@ -108,7 +108,7 @@ export default function ProductPage({ params }: { params: { spaceName: string } 
         <div className="mb-6 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">{spaceName}</h1>
-            <p className="text-gray-400">Space public URL: localhost:3001/{spaceName.toLowerCase().replace(/\s+/g, '-')}</p>
+            <p className="text-gray-400">Space public URL: {process.env.NEXT_PUBLIC_PRODUCTION_URL}/{spaceName.toLowerCase().replace(/\s+/g, '-')}</p>
           </div>
            <div className="flex space-x-4">
             <button className="bg-gray-700 px-4 py-2 rounded">Edit Space</button>
