@@ -55,7 +55,7 @@ export default function EmbeddedTestimonials({ error, testimonials, spaceName }:
 
   return (
     <IframeResizer
-      license=''
+      license='GPLv3'
       checkOrigin={false}
       onResized={(event) => {
         console.log(`Iframe resized to ${event.height}px height and ${event.width}px width`);
