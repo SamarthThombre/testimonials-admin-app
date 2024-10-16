@@ -20,16 +20,6 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-# My Project
-
-This project is an open-source testimonial application developed using Next.js and Firebase. 
-
-## License
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0). See the [LICENSE](./LICENSE) file for details.
-
-## Attribution
-This project uses [iframe-resizer](https://iframe-resizer.com/), which is licensed under the GPL V3 license. Please refer to their [official site](https://iframe-resizer.com/) for more details.
-
 
 ## Deploy on Vercel
 
