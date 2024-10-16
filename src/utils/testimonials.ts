@@ -7,12 +7,17 @@ export async function getTestimonials(spaceName: string) {
     const q = query(testimonialsRef, where("spaceId", "==", spaceName));
     const querySnapshot = await getDocs(q);
     
+    if (querySnapshot.empty) {
+      console.log('No testimonials found for this space');
+      return [];
+    }
+
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
     }));
   } catch (error) {
     console.error('Error fetching testimonials:', error);
-    return [];
+    throw error; // Re-throw the error to be handled by the caller
   }
 }

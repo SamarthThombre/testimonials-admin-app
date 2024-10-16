@@ -7,6 +7,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest, { params }: { params: { spaceName: string } }) {
   const { spaceName } = params;
+  if (!spaceName) {
+    return NextResponse.json({ error: 'Space name is required' }, { status: 400 });
+  }
   try {
     const testimonials = await getTestimonials(spaceName);
     console.log('Fetched testimonials:', testimonials);
